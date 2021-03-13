@@ -2,7 +2,7 @@ const B = require("@jsprismarine/brigadier");
 const File = require("!io/File");
 const MCF = require("../Function");
 module.exports = (api) => {
-  api.registerParticipant(api.participants.top, "function", (Host) => {
+  api.registerParticipant(api.participants.top, "dir", (Host) => {
     Host.register(
       B.literal("dir").then(
         B.argument("name", B.string()).then(

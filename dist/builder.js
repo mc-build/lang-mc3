@@ -69,7 +69,7 @@ function build({
     .forEach((item) => item.toFile().confirm());
   if (config.debug.dump) {
     const dumpTracker = Logger.track("[commands dump]");
-    console.log(
+    Logger.log(
       util.inspect(
         {
           top: topLevelConsumer,

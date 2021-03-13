@@ -8,6 +8,7 @@ const config = require("!config/mc");
 const log = require("!logger");
 const deepMerge = require("deep-extend");
 const builder = require("./builder");
+const Logger = require("./logUtil");
 let namespaces = [];
 
 const participants = {
@@ -404,7 +405,7 @@ function default_1(registry) {
     if (config.debug.il) {
       fs.mkdirSync(path.parse(intermediary).dir, { recursive: true });
       fs.writeFileSync(intermediary, toString());
-      if (config.debug.logging) console.log(intermediary);
+      if (config.debug.logging) Logger.log(intermediary);
     }
     log.log(`created ${howManyGroupsAreThere} group(s)`);
     builder.build({

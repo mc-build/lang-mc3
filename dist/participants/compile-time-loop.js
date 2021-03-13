@@ -2,7 +2,7 @@ const B = require("@jsprismarine/brigadier");
 const { BlockArgument } = require("../BlockArgument");
 const { ScriptArgument } = require("../ScriptArgument");
 module.exports = (api) => {
-  const Loop = (Host) => {
+  const Loop = (Host, target) => {
     Host.register(
       B.literal("LOOP").then(
         B.argument("var_name", B.string())
@@ -26,7 +26,7 @@ module.exports = (api) => {
                     for (let command of block.block) {
                       result.push(
                         api.dispatch(
-                          "generic",
+                          target,
                           command,
                           {
                             ...ctx.getSource(),
@@ -59,7 +59,7 @@ module.exports = (api) => {
                       for (let command of block.block) {
                         result.push(
                           api.dispatch(
-                            "generic",
+                            target,
                             command,
                             {
                               ...ctx.getSource(),
@@ -99,12 +99,10 @@ module.exports = (api) => {
   };
   api.registerParticipant(
     api.participants.generic,
-    "compile time loop",
-    (Host) => {
-      Loop(Host);
-    }
+    "compile-time-loop",
+    (Host) => Loop(Host, api.participants.generic)
   );
-  api.registerParticipant(api.participants.top, "compile-time-loop", (Host) => {
-    Loop(Host);
-  });
+  api.registerParticipant(api.participants.top, "compile-time-loop", (Host) =>
+    Loop(Host, api.participants.top)
+  );
 };

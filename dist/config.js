@@ -6,5 +6,6 @@ exports.default = {
     il: false,
     logging: false,
     dump: false,
+    logFile: null,
   },
 };
