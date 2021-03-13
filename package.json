@@ -3,18 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "./lib/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "dev": "tsc -w",
-    "lint": "tslint -c tslint.json src/**/*.ts",
-    "prepublish": "npm run build"
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@jsprismarine/brigadier": "^0.2.0-rc.1",
     "@types/node": "^14.14.21",
+    "chalk": "^4.1.0",
     "deep-extend": "^0.6.0",
     "fs": "0.0.1-security",
     "mathjs": "^9.3.0"
