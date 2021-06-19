@@ -1,1 +1,1 @@
-module.exports = require("./dist/config.js").default;
+module.exports = require("./build/config.js").default;

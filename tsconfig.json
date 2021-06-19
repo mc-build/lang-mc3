@@ -1,0 +1,28 @@
+{
+    "include": [
+        "./src/**/*.ts",
+        "./src/**/*.tsx"
+    ],
+    "compilerOptions": {
+        "outDir": "./build",
+        "target": "ES2019",
+        "moduleResolution": "Node",
+        "listEmittedFiles": true,
+        "strict": true,
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "jsx": "react",
+        "jsxFactory": "jsx",
+        "jsxFragmentFactory": "jsx.f",
+        "lib": [
+            "es2015",
+            "es2016",
+            "ESNext"
+        ],
+    },
+    "typeAcquisition": {
+        "include": [
+            "./types/**/*.d.ts"
+        ]
+    }
+}

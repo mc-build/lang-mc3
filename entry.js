@@ -1,1 +1,1 @@
-module.exports = require("./dist/entry.js").default;
+module.exports = require("./build/entry.js").default;
