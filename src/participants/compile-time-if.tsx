@@ -20,6 +20,7 @@ export const bind = ({
     };
     getSource: () => any;
   }) => {
+    debugger;
     const source = ctx.getSource();
     let h2;
     try {

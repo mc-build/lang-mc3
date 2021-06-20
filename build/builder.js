@@ -24,7 +24,6 @@ function reset_builder(host) {
 }
 exports.reset_builder = reset_builder;
 function builder(item) {
-    debugger;
     if (typeof item === "string")
         return item;
     const children = item.children.flat(Infinity);
@@ -59,7 +58,6 @@ function builder(item) {
             return `${ns_data.namespace}:${complete}`;
         }
         case "dir": {
-            debugger;
             directory_stack.push(item.attributes.name);
             children.forEach((item) => {
                 builder(item);

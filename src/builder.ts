@@ -18,7 +18,6 @@ export function reset_builder(host:MCLang3File){
   file_path = host.file_path;
 } 
 export function builder(item: any) {
-  debugger;
   if(typeof item === "string")return item;
   const children = item.children.flat(Infinity);
   const attributes = item.attributes || {};
@@ -52,7 +51,6 @@ export function builder(item: any) {
       return `${ns_data.namespace}:${complete}`;
     }
     case "dir":{
-      debugger;
       directory_stack.push(item.attributes.name);
       children.forEach((item:any) => {
         builder(item);

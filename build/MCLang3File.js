@@ -29,8 +29,8 @@ const fileCache_1 = require("./fileCache");
 const tokenizer_1 = require("./tokenizer");
 const Consumer_1 = require("./Consumer");
 const ScriptableLanguage_1 = require("./ScriptableLanguage");
-const fs_2 = require("fs");
 const builder_1 = require("./builder");
+const CachableArgument_1 = require("./args/CachableArgument");
 const logger = require("!logger");
 const cache_location = getCacheLocation("lang-mc3");
 function clean(o) {
@@ -86,8 +86,8 @@ function mergeTokens(list) {
                     result.push(new ILT(acc[0].token, acc.map(_ => _.value).join(" "), acc[0].parent));
                     acc = [];
                     start = -1;
+                    i--;
                 }
-                result.push(list[i]);
             }
         }
         else if (parent instanceof tokenizer_1.Token) {
@@ -100,8 +100,8 @@ function mergeTokens(list) {
                     result.push(new ILT(acc[0].token, acc.map(_ => _.value).join(" "), acc[0].parent));
                     acc = [];
                     start = -1;
+                    i--;
                 }
-                result.push(list[i]);
             }
         }
     }
@@ -173,7 +173,14 @@ class MCLang3File {
             file: this.file_path,
             line: ilc.token.line,
         });
-        const line = await ScriptableLanguage_1.ScriptableLanguage.evaluateInlineBlocks(ilc.value, source.env);
+        CachableArgument_1.CacheableArgument.reset();
+        let cmd = ilc.value;
+        if (source.replacements && source.replacements.length > 0) {
+            source.replacements.forEach(([target, val]) => {
+                cmd = cmd.replace(target, val);
+            });
+        }
+        const line = await ScriptableLanguage_1.ScriptableLanguage.evaluateInlineBlocks(cmd, source.env);
         let res = line;
         try {
             res = (await ((_a = this.handlers.get(type)) === null || _a === void 0 ? void 0 : _a.executeAsync(res, source))) || res;
@@ -219,7 +226,8 @@ class MCLang3File {
         }
         this.dependencies = new Set();
         for (let i = 0; i < using_statements.length; i++) {
-            this.dependencies.add(await this.load(using_statements[i]));
+            let dep = await this.load(using_statements[i]);
+            this.dependencies.add(dep);
         }
         this.dependencies.forEach((dependency) => dependency.addDependent(this));
         CompileTimeError_1.CompileTimeError.pop_stack();
@@ -279,17 +287,18 @@ class MCLang3File {
         this.blocks = IL;
         const something = [];
         for (let i = 0; i < ROOT.length; i++) {
-            let c = await this.execute("top", ROOT[i], { ...ScriptableLanguage_1.ScriptableLanguage.baseEnv });
+            let c = await this.execute("top", ROOT[i], { env: ScriptableLanguage_1.ScriptableLanguage.baseEnv });
             something.push(...(await Promise.all(Array.isArray(c) ? c : [c])));
         }
         const cleaned = await clean(something);
-        builder_1.reset_builder(this);
-        cleaned.forEach((element) => {
-            if (typeof element !== "string") {
-                builder_1.builder(element);
-            }
-        });
-        fs_2.writeFileSync("./debug.json", require("util").inspect(cleaned, { depth: Infinity }));
+        if (this.type === FileType.MC) {
+            builder_1.reset_builder(this);
+            cleaned.forEach((element) => {
+                if (typeof element !== "string") {
+                    builder_1.builder(element);
+                }
+            });
+        }
         // require("fs").writeFileSync(
         //   `./tree.${
         //     path.parse(this.file_path).name + "_" + path.parse(this.file_path).ext
@@ -306,7 +315,7 @@ class MCLang3File {
         this.dependents = new Set();
         if (toBuild.length > 0) {
             logger.log(`building ${toBuild.length} additional file${toBuild.length === 1 ? "" : "s"}...`);
-            await Promise.all(toBuild.map((file) => file.update(force)));
+            await Promise.all(toBuild.map((file) => file.update(true)));
         }
         CompileTimeError_1.CompileTimeError.pop_stack();
     }

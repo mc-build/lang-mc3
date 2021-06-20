@@ -30,6 +30,7 @@ const bind = ({ get, file, }) => {
         .then(B.literal("value").then(B.argument("count", B.string()).then(
     //@ts-ignore-next-line
     B.argument("block", new BlockArgument_1.BlockArgument(file, false, false)).executes(async (ctx) => {
+        debugger;
         const source = ctx.getSource();
         let min = 0;
         let max = ctx.getArgument("count");

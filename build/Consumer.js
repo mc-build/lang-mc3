@@ -35,8 +35,8 @@ function bindMacros({ get, file }) {
     const consumer = get("generic");
     const macro_root = B.literal("macro");
     Object.entries(macros).forEach(([key, value]) => {
-        macro_root.then(B.literal(key).then(B.argument("args", B.greedyString()).executes(value)));
-        consumer.register(B.literal(key).then(B.argument("args", B.greedyString()).executes(value)));
+        macro_root.then(B.literal(key).then(B.argument("args", B.greedyString()).executes(value)).executes(value));
+        consumer.register(B.literal(key).then(B.argument("args", B.greedyString()).executes(value)).executes(value));
     });
     consumer.register(macro_root);
 }
@@ -61,13 +61,21 @@ function gather(file) {
     }
     get("top");
     get("generic");
-    bindMacros({ get, file, expose(name, callable) {
-            file.addExport(name, callable);
-        } });
+    bindMacros({
+        get,
+        file,
+        expose: () => { }
+    });
     for (let i = 0; i < paths.length; i++) {
         if (!modules.has(paths[i]))
             modules.set(paths[i], require(paths[i]));
-        modules.get(paths[i]).bind({ get, file });
+        modules.get(paths[i]).bind({
+            get,
+            file,
+            expose(name, callable) {
+                file.addExport(name, callable);
+            },
+        });
     }
     return consumers;
 }

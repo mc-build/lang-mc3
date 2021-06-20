@@ -29,6 +29,7 @@ const bind = ({ get, file, }) => {
     const Host = get("generic");
     const compileTimeIfStatement = async (ctx) => {
         var _a;
+        debugger;
         const source = ctx.getSource();
         let h2;
         try {

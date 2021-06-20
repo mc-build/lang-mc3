@@ -10,6 +10,7 @@ import { gather } from "./Consumer";
 import { ScriptableLanguage } from "./ScriptableLanguage";
 import { writeFileSync } from "fs";
 import { builder, reset_builder } from "./builder";
+import { CacheableArgument } from "./args/CachableArgument";
 
 const logger = require("!logger");
 const cache_location = getCacheLocation("lang-mc3");
@@ -64,8 +65,8 @@ function mergeTokens(list: ILT[]) {
           result.push(new ILT(acc[0].token,acc.map(_=>_.value).join(" "),acc[0].parent));
           acc = [];
           start = -1;
+          i--;
         }
-        result.push(list[i]);
       }
     }else if(parent instanceof Token){
       if(start === -1 || parent.line === start){
@@ -76,8 +77,8 @@ function mergeTokens(list: ILT[]) {
           result.push(new ILT(acc[0].token,acc.map(_=>_.value).join(" "),acc[0].parent));
           acc = [];
           start = -1;
+          i--
         }
-        result.push(list[i]);
       }
     }
   }
@@ -162,8 +163,15 @@ export class MCLang3File {
       file: this.file_path,
       line: ilc.token.line,
     });
+    CacheableArgument.reset();
+    let cmd = ilc.value;
+    if(source.replacements && source.replacements.length>0){
+      source.replacements.forEach(([target,val]:[RegExp,string])=>{
+        cmd = cmd.replace(target,val);
+      })
+    }
     const line = await ScriptableLanguage.evaluateInlineBlocks(
-      ilc.value,
+      cmd,
       source.env
     );
     let res = line;
@@ -210,7 +218,8 @@ export class MCLang3File {
     }
     this.dependencies = new Set();
     for (let i = 0; i < using_statements.length; i++) {
-      this.dependencies.add(await this.load(using_statements[i]));
+      let dep = await this.load(using_statements[i])
+      this.dependencies.add(dep);
     }
     this.dependencies.forEach((dependency) => dependency.addDependent(this));
     CompileTimeError.pop_stack();
@@ -271,20 +280,18 @@ export class MCLang3File {
     this.blocks = IL;
     const something = [];
     for (let i = 0; i < ROOT.length; i++) {
-      let c = await this.execute("top", ROOT[i], {...ScriptableLanguage.baseEnv});
+      let c = await this.execute("top", ROOT[i], {env:ScriptableLanguage.baseEnv});
       something.push(...(await Promise.all(Array.isArray(c) ? c : [c])));
     }
     const cleaned = await clean(something);
-    reset_builder(this);
-    cleaned.forEach((element: any) => {
-      if (typeof element !== "string") {
-        builder(element);
-      }
-    });
-    writeFileSync(
-      "./debug.json",
-      require("util").inspect(cleaned, { depth: Infinity })
-    );
+    if(this.type === FileType.MC){
+      reset_builder(this);
+      cleaned.forEach((element: any) => {
+        if (typeof element !== "string") {
+          builder(element);
+        }
+      });
+    }
     // require("fs").writeFileSync(
     //   `./tree.${
     //     path.parse(this.file_path).name + "_" + path.parse(this.file_path).ext
@@ -305,7 +312,7 @@ export class MCLang3File {
           toBuild.length === 1 ? "" : "s"
         }...`
       );
-      await Promise.all(toBuild.map((file) => file.update(force)));
+      await Promise.all(toBuild.map((file) => file.update(true)));
     }
     CompileTimeError.pop_stack();
   }

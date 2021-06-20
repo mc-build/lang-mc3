@@ -23,6 +23,7 @@ export const bind = ({
                 "block",
                 new BlockArgument(file, false, false)
               ).executes(async (ctx: B.CommandContext<any>) => {
+                debugger;
                 const source = ctx.getSource();
                 let min = 0;
                 let max = ctx.getArgument("count");
