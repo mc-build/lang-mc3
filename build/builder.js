@@ -15,10 +15,12 @@ function findNamespaceFromFilepath(fp) {
     const ns = segments.shift();
     return { namespace: ns, base: [...segments.slice(1)] };
 }
+let func_stack = [];
 function reset_builder(host) {
     seen = new Set();
     ns_data = findNamespaceFromFilepath(host.file_path);
     directory_stack = [];
+    func_stack = [];
     gid = 0;
     file_path = host.file_path;
 }
@@ -52,9 +54,14 @@ function builder(item) {
                 generated = true;
             }
             const complete = [...ns_data.base, generated ? "generated" : null, ...directory_stack, _name].filter(Boolean).join("/");
+            func_stack.push(`${ns_data.namespace}:${complete}`);
             f.setPath(path_1.default.resolve(process.cwd(), `data/${ns_data.namespace}/functions/${complete}.mcfunction`));
-            f.setContents(children.map(builder).join("\n"));
+            f.setContents(children.map(builder).join("\n").replace(/(<\.+>)/, (match) => {
+                const size = match.length - 2;
+                return func_stack[func_stack.length - size];
+            }));
             f.confirm(file_path);
+            func_stack.pop();
             return `${ns_data.namespace}:${complete}`;
         }
         case "dir": {
