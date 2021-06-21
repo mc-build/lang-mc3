@@ -10,7 +10,8 @@ const path_1 = __importDefault(require("path"));
 let gid = 0;
 let seen, ns_data, directory_stack, file_path;
 function findNamespaceFromFilepath(fp) {
-    const segments = fp.replace(/\..+$/, "").split(path_1.default.sep);
+    const ext = path_1.default.parse(fp).ext;
+    const segments = fp.substr(0, fp.length - ext.length).split(path_1.default.sep);
     segments.splice(0, segments.lastIndexOf("src") + 1);
     const ns = segments.shift();
     return { namespace: ns, base: [...segments.slice(1)] };
@@ -56,7 +57,11 @@ function builder(item) {
             const complete = [...ns_data.base, generated ? "generated" : null, ...directory_stack, _name].filter(Boolean).join("/");
             func_stack.push(`${ns_data.namespace}:${complete}`);
             f.setPath(path_1.default.resolve(process.cwd(), `data/${ns_data.namespace}/functions/${complete}.mcfunction`));
-            f.setContents(children.map(builder).join("\n").replace(/(<\.+>)/, (match) => {
+            f.setContents(children.map(builder).join("\n")
+                .replace(/function (\.+)/g, "function <$1>")
+                .replace(/\$parent/g, "<..>")
+                .replace(/\$block/g, "<.>")
+                .replace(/(<\.+>)/g, (match) => {
                 const size = match.length - 2;
                 return func_stack[func_stack.length - size];
             }));
