@@ -8,7 +8,6 @@ import { Token, tokenize } from "./tokenizer";
 import * as B from "@mc-build/brigadier";
 import { gather } from "./Consumer";
 import { ScriptableLanguage } from "./ScriptableLanguage";
-import { writeFileSync } from "fs";
 import { builder, reset_builder } from "./builder";
 import { CacheableArgument } from "./args/CachableArgument";
 
@@ -158,7 +157,7 @@ export class MCLang3File {
   addExport(name: string, callable: Function) {
     this.exports.set(name,callable);
   }
-  async execute(type: string, ilc: ILT, source: any) {
+  async execute(type: string, ilc: ILT, source: any,addToBlock:null|((item:any)=>void)) {
     CompileTimeError.push_stack({
       file: this.file_path,
       line: ilc.token.line,
@@ -172,7 +171,8 @@ export class MCLang3File {
     }
     const line = await ScriptableLanguage.evaluateInlineBlocks(
       cmd,
-      source.env
+      source.env,
+      addToBlock
     );
     let res = line;
     try {
@@ -264,6 +264,7 @@ export class MCLang3File {
       this.file_path,
       readFileSync(this.file_path, "utf-8")
     );
+    ScriptableLanguage.setFile(this);
     let _blocks = [];
     
     while (tokens.length) {
@@ -280,7 +281,7 @@ export class MCLang3File {
     this.blocks = IL;
     const something = [];
     for (let i = 0; i < ROOT.length; i++) {
-      let c = await this.execute("top", ROOT[i], {env:ScriptableLanguage.baseEnv});
+      let c = await this.execute("top", ROOT[i], {env:ScriptableLanguage.baseEnv},null);
       something.push(...(await Promise.all(Array.isArray(c) ? c : [c])));
     }
     const cleaned = await clean(something);

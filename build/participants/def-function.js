@@ -11,9 +11,11 @@ const bind = ({ get, file, }) => {
             const name = ctx.getArgument("name");
             const block = ctx.getArgument("block");
             const src = ctx.getSource();
-            return (jsx_1.jsx(jsx_1.Func, { name: name }, asyncMap_1.asyncMap(file.getBlock(block), async (ilc) => {
-                return file.execute("generic", ilc, src);
-            })));
+            let res = [];
+            asyncMap_1.asyncMap(file.getBlock(block), async (ilc) => {
+                return file.execute("generic", ilc, src, v => res.push(v));
+            });
+            return (jsx_1.jsx(jsx_1.Func, { name: name }, res));
         })))));
     }
 };

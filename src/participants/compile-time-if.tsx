@@ -31,11 +31,12 @@ export const bind = ({
     for (let i = 0; i < block.length; i++) {
       if (
         i >= conditions.length ||
-        await ScriptableLanguage.evaluateCode(`return ${conditions[i].script}`, source.env)
+        await ScriptableLanguage.evaluateCode(`return ${conditions[i].script}`, source.env,null)
       ) {
         return await asyncMap(block[i].block,async (command: any) => {
-          let res = await file.execute("generic", command, source);
-          return res || command.value;
+          const res = [];
+          res.push(await file.execute("generic", command, source,(i)=>res.push(i)));
+          return res.length?res:command.value;
         });
       }
     }

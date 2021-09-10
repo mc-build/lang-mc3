@@ -50,7 +50,7 @@ export const bind = ({
                           ...source.env,
                           [var_name]: i,
                         }
-                      })
+                      },(v)=>result.push(v))
                     );
                   }
                 }
@@ -69,7 +69,8 @@ export const bind = ({
                   const source = ctx.getSource();
                   const in_value = await ScriptableLanguage.evaluateCode(
                     `return ${ctx.getArgument("value").script}`,
-                    source.env
+                    source.env,
+                    null
                   );
                   const var_name = ctx.getArgument("var_name");
                   const { block } = ctx.getArgument("block");
@@ -85,7 +86,7 @@ export const bind = ({
                               ...source.env,
                               [var_name]: item,
                             }
-                          })
+                          },(i)=>result.push(i))
                         );
                       }
                     }
@@ -100,7 +101,7 @@ export const bind = ({
                               ...source.env,
                               [var_name]: { key, value },
                             }
-                          })
+                          },(i)=>result.push(i))
                         );
                       }
                     }

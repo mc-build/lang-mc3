@@ -68,6 +68,7 @@ export function builder(item: any) {
         builder(item);
       });
       directory_stack.pop();
+      break;
     }
     case "raw": {
       return children.map(builder).join("");

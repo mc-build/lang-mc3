@@ -24,11 +24,13 @@ export const bind = ({
               const name = ctx.getArgument("name");
               const block = ctx.getArgument("block");
               const src = ctx.getSource();
+              let res: any[] = [];
+              asyncMap(file.getBlock(block),async (ilc:any) => {
+                return file.execute("generic", ilc, src,v=>res.push(v)) as Promise<string>;
+              })
               return (
                 <Func name={name}>
-                  {asyncMap(file.getBlock(block),async (ilc:any) => {
-                    return file.execute("generic", ilc, src) as Promise<string>;
-                  })}
+                  {res}
                 </Func>
               );
             })

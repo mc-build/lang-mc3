@@ -40,10 +40,11 @@ const bind = ({ get, file, }) => {
         const conditions = ctx.getArgument("script").getHistory();
         for (let i = 0; i < block.length; i++) {
             if (i >= conditions.length ||
-                await ScriptableLanguage_1.ScriptableLanguage.evaluateCode(`return ${conditions[i].script}`, source.env)) {
+                await ScriptableLanguage_1.ScriptableLanguage.evaluateCode(`return ${conditions[i].script}`, source.env, null)) {
                 return await asyncMap_1.asyncMap(block[i].block, async (command) => {
-                    let res = await file.execute("generic", command, source);
-                    return res || command.value;
+                    const res = [];
+                    res.push(await file.execute("generic", command, source, (i) => res.push(i)));
+                    return res.length ? res : command.value;
                 });
             }
         }

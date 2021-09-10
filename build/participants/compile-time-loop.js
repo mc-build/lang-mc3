@@ -53,7 +53,7 @@ const bind = ({ get, file, }) => {
                         ...source.env,
                         [var_name]: i,
                     }
-                }));
+                }, (v) => result.push(v)));
             }
         }
         return result;
@@ -62,7 +62,7 @@ const bind = ({ get, file, }) => {
     //@ts-ignore-next-line
     B.argument("block", new BlockArgument_1.BlockArgument(file, false, false)).executes(async (ctx) => {
         const source = ctx.getSource();
-        const in_value = await ScriptableLanguage_1.ScriptableLanguage.evaluateCode(`return ${ctx.getArgument("value").script}`, source.env);
+        const in_value = await ScriptableLanguage_1.ScriptableLanguage.evaluateCode(`return ${ctx.getArgument("value").script}`, source.env, null);
         const var_name = ctx.getArgument("var_name");
         const { block } = ctx.getArgument("block");
         const result = [];
@@ -76,7 +76,7 @@ const bind = ({ get, file, }) => {
                             ...source.env,
                             [var_name]: item,
                         }
-                    }));
+                    }, (i) => result.push(i)));
                 }
             }
         }
@@ -90,7 +90,7 @@ const bind = ({ get, file, }) => {
                             ...source.env,
                             [var_name]: { key, value },
                         }
-                    }));
+                    }, (i) => result.push(i)));
                 }
             }
         }

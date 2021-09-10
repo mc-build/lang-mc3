@@ -75,6 +75,7 @@ function builder(item) {
                 builder(item);
             });
             directory_stack.pop();
+            break;
         }
         case "raw": {
             return children.map(builder).join("");

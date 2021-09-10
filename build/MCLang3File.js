@@ -167,7 +167,7 @@ class MCLang3File {
     addExport(name, callable) {
         this.exports.set(name, callable);
     }
-    async execute(type, ilc, source) {
+    async execute(type, ilc, source, addToBlock) {
         var _a;
         CompileTimeError_1.CompileTimeError.push_stack({
             file: this.file_path,
@@ -180,7 +180,7 @@ class MCLang3File {
                 cmd = cmd.replace(target, val);
             });
         }
-        const line = await ScriptableLanguage_1.ScriptableLanguage.evaluateInlineBlocks(cmd, source.env);
+        const line = await ScriptableLanguage_1.ScriptableLanguage.evaluateInlineBlocks(cmd, source.env, addToBlock);
         let res = line;
         try {
             res = (await ((_a = this.handlers.get(type)) === null || _a === void 0 ? void 0 : _a.executeAsync(res, source))) || res;
@@ -270,6 +270,7 @@ class MCLang3File {
         this.handlers = Consumer_1.gather(this);
         CompileTimeError_1.CompileTimeError.pop_stack();
         const tokens = tokenizer_1.tokenize(this.file_path, fs_1.readFileSync(this.file_path, "utf-8"));
+        ScriptableLanguage_1.ScriptableLanguage.setFile(this);
         let _blocks = [];
         while (tokens.length) {
             if (!tokens[0].value.startsWith("using"))
@@ -287,7 +288,7 @@ class MCLang3File {
         this.blocks = IL;
         const something = [];
         for (let i = 0; i < ROOT.length; i++) {
-            let c = await this.execute("top", ROOT[i], { env: ScriptableLanguage_1.ScriptableLanguage.baseEnv });
+            let c = await this.execute("top", ROOT[i], { env: ScriptableLanguage_1.ScriptableLanguage.baseEnv }, null);
             something.push(...(await Promise.all(Array.isArray(c) ? c : [c])));
         }
         const cleaned = await clean(something);
