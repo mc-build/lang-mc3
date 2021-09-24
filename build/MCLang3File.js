@@ -167,7 +167,7 @@ class MCLang3File {
     addExport(name, callable) {
         this.exports.set(name, callable);
     }
-    async execute(type, ilc, source, addToBlock) {
+    async execute(type, ilc, source, addToBlock = null) {
         var _a;
         CompileTimeError_1.CompileTimeError.push_stack({
             file: this.file_path,

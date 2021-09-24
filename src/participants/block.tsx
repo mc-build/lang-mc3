@@ -21,7 +21,11 @@ export const bind = ({
             <Raw>
               function <Func>
                 {asyncMap(file.getBlock(block),async (ilc: ILT) => {
-                  return file.execute("generic", ilc, src) as Promise<string>;
+                  let result = [];
+                  result.push(await file.execute("generic", ilc, src,(item)=>{
+                    result.push(item);
+                  }) as Promise<string>);
+                  return result;
                 })}
               </Func>
             </Raw>

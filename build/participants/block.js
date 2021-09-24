@@ -31,7 +31,11 @@ const bind = ({ get, file, }) => {
         let res = await (jsx_1.jsx(jsx_1.Raw, null,
             "function ",
             jsx_1.jsx(jsx_1.Func, null, asyncMap_1.asyncMap(file.getBlock(block), async (ilc) => {
-                return file.execute("generic", ilc, src);
+                let result = [];
+                result.push(await file.execute("generic", ilc, src, (item) => {
+                    result.push(item);
+                }));
+                return result;
             }))));
         return res;
     }))));

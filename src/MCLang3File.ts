@@ -157,7 +157,7 @@ export class MCLang3File {
   addExport(name: string, callable: Function) {
     this.exports.set(name,callable);
   }
-  async execute(type: string, ilc: ILT, source: any,addToBlock:null|((item:any)=>void)) {
+  async execute(type: string, ilc: ILT, source: any,addToBlock:null|((item:any)=>void) = null) {
     CompileTimeError.push_stack({
       file: this.file_path,
       line: ilc.token.line,

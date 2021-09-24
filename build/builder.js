@@ -7,6 +7,7 @@ exports.builder = exports.reset_builder = void 0;
 // @ts-ignore
 const _io_1 = require("!io");
 const path_1 = __importDefault(require("path"));
+const tags = require("!lang/shared-tags");
 let gid = 0;
 let seen, ns_data, directory_stack, file_path;
 function findNamespaceFromFilepath(fp) {
@@ -55,6 +56,11 @@ function builder(item) {
                 generated = true;
             }
             const complete = [...ns_data.base, generated ? "generated" : null, ...directory_stack, _name].filter(Boolean).join("/");
+            if (_name === "tick" || _name === "load") {
+                console.log(attributes, item);
+                console.log(`${ns_data.namespace}:${complete}`);
+                tags[_name].add(file_path, `${ns_data.namespace}:${complete}`);
+            }
             func_stack.push(`${ns_data.namespace}:${complete}`);
             f.setPath(path_1.default.resolve(process.cwd(), `data/${ns_data.namespace}/functions/${complete}.mcfunction`));
             f.setContents(children.map(builder).join("\n")
