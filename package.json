@@ -20,7 +20,7 @@
 		"dev": "node ./tools/esbuild.js --mode=dev",
 		"build": "node ./tools/esbuild.js",
 		"lint": "prettier --write .",
-		"test": "jest --watchAll --verbose"
+		"test": "jest --verbose"
 	},
 	"devDependencies": {
 		"@types/jest": "^28.1.6",

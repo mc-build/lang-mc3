@@ -1,3 +1,10 @@
 
-dir my_dir {
+dir foo {
+	dir bar {
+	}
+	dir qux {
+	}
+}
+
+dir quux {
 }

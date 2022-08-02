@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as pathjs from 'path'
+import * as YAML from 'js-yaml'
 
 export class VirtualFile {
 	public extention?: string
@@ -13,9 +14,16 @@ export class VirtualFile {
 		}
 		return this.name
 	}
+	parseJSON(): any {
+		return JSON.parse(this.content)
+	}
+	parseYAML(): any {
+		return YAML.load(this.content)
+	}
 	toJSON(): any {
 		return {
 			name: this.name,
+			extention: this.extention,
 			path: this.getPath(),
 			content: this.content,
 		}
@@ -39,16 +47,50 @@ export class VirtualFolder {
 	getChild(name: string): VirtualFile | VirtualFolder | undefined {
 		return this.children.find(child => child.name === name)
 	}
+	getFile(name: string | RegExp, recursive?: boolean): VirtualFile | undefined {
+		for (const child of this.children) {
+			if (child instanceof VirtualFile) {
+				if ((name instanceof RegExp && name.test(child.name)) || child.name === name) return child
+			} else if (recursive) {
+				const file = child.getFile(name, recursive)
+				if (file) return file
+			}
+		}
+	}
 	getFiles(name?: string | RegExp, recursive?: boolean) {
-		const children: (VirtualFile | VirtualFolder)[] = []
+		const children: VirtualFile[] = []
 		for (const child of this.children) {
 			if (child instanceof VirtualFile) {
 				// If the file's name matches the string or regexp, add it to the list
-				if ((name instanceof RegExp && name.test(child.name)) || child.name === name) {
+				if (name === undefined || (name instanceof RegExp && name.test(child.name)) || child.name === name) {
 					children.push(child)
 				}
 			} else if (recursive) {
 				children.push(...child.getFiles(name, recursive))
+			}
+		}
+		return children
+	}
+	getFolder(name: string | RegExp, recursive?: boolean): VirtualFolder | undefined {
+		for (const child of this.children) {
+			if (child instanceof VirtualFolder) {
+				if ((name instanceof RegExp && name.test(child.name)) || child.name === name) return child
+				if (recursive) {
+					const folder = child.getFolder(name, recursive)
+					if (folder) return folder
+				}
+			}
+		}
+	}
+	getFolders(name?: string | RegExp, recursive?: boolean) {
+		const children: VirtualFolder[] = []
+		for (const child of this.children) {
+			if (child instanceof VirtualFolder) {
+				// If the folder's name matches the string or regexp, add it to the list
+				if (name === undefined || (name instanceof RegExp && name.test(child.name)) || child.name === name) {
+					children.push(child)
+				}
+				if (recursive) children.push(...child.getFolders(name, recursive))
 			}
 		}
 		return children
