@@ -1,8 +1,7 @@
 {
-	"name": "Lang-MC3",
+	"name": "lang-mc3",
 	"title": "Lang-MC3",
 	"version": "1.0.0",
-	"min_blockbench_version": "4.2.0",
 	"author": {
 		"name": "SnaveSutit",
 		"email": "snavesutit@gmail.com",
@@ -35,6 +34,7 @@
 	},
 	"dependencies": {
 		"chokidar": "^3.5.3",
-		"js-yaml": "^4.1.0"
+		"js-yaml": "^4.1.0",
+		"terminal-kit": "^3.0.0"
 	}
 }
