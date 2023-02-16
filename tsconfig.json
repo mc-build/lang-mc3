@@ -1,15 +1,15 @@
 {
+	"include": ["./src/**/*"],
+	"exclude": ["./node_modules", "./dist", "./types"],
 	"compilerOptions": {
-		"outDir": "./dist/",
+		"declarationDir": "./types/",
 		"noImplicitAny": true,
-		"module": "es2020",
-		"target": "ES2021",
-		"jsx": "react",
-		"allowJs": true,
+		"module": "es2022",
+		"target": "ES2022",
 		"moduleResolution": "node",
 		"strict": true,
 		"resolveJsonModule": true,
-		"declaration": true
-		// "emitDeclarationOnly": true
+		"declaration": true,
+		"emitDeclarationOnly": true
 	}
 }

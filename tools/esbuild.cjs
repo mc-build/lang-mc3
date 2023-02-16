@@ -22,19 +22,6 @@ let infoPlugin = {
 				`\u{2705} Build completed in ${diff}ms with ${result.warnings.length} warnings and ${result.errors.length} errors.`
 			)
 		})
-
-		build.onLoad(
-			{
-				filter: /\.[tj]sx?$/,
-			},
-			result => {
-				const code = fs.readFileSync(result.path, 'utf-8')
-				return {
-					contents: 'const devlog = console.log;\n' + code,
-					loader: 'ts',
-				}
-			}
-		)
 	},
 }
 
@@ -76,7 +63,6 @@ function createBanner(dev) {
 }
 
 function buildDev() {
-	esbuild.transformSync('function devlog(...args) {console.log(...args)}')
 	esbuild.build({
 		entryPoints: ['./src/index.ts'],
 		outfile: `./dist/${PACKAGE.name}.js`,
@@ -91,7 +77,6 @@ function buildDev() {
 }
 
 function buildProd() {
-	esbuild.transformSync('function devlog(...args) {}')
 	esbuild.build({
 		entryPoints: ['./src/index.ts'],
 		outfile: `./dist/${PACKAGE.name}.js`,
@@ -107,7 +92,7 @@ function buildProd() {
 }
 
 function main() {
-	if (process.argv.includes('--mode=dev')) {
+	if (process.argv.includes('--dev')) {
 		buildDev()
 		return
 	}
